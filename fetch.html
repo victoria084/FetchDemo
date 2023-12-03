@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch / XHR / AJAX</title>
+</head>
+<body>
+
+    <h3>取得氣象資料</h3>
+    <button onclick="getWeatherData();">取得資料</button>
+    <div id="weather"></div>
+        <!--
+            <div>縣市名稱 最低溫 ~ 最高溫</div>
+            <div>縣市名稱 最低溫 ~ 最高溫</div>
+            
+        -->
+    <script>
+         //授權碼CWA-1ACB716D-CC63-46AA-A356-E6B637F14786
+        //https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=CWA-1ACB716D-CC63-46AA-A356-E6B637F14786
+        function getWeatherData(){
+            let src="https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=CWA-1ACB716D-CC63-46AA-A356-E6B637F14786"
+            fetch(src).then(function(response){
+                //console.log(response);//meta data附加資訊
+                return response.json();//使用JSON資料格式解析取得的資料
+            }).then(function(result){
+                //在這裡取得後端回應的資料
+                console.log(result);
+                //console.log(result.records.location[5].weatherElement[2].time[0].parameter.parameterName+'度');
+                let location=result.records.location;
+                let list =document.querySelector('#weather');
+                for(let i=0;i<location.length;i++){
+                    
+                    // [3].weatherElement[2].time
+                    // list.innerHTML=list.innerHTML+"<div>"+location[i].locationName+":"+location[i].weatherElement[i].time[i].parameter.parameterName+"</div>";
+                    const locationName = location[i].locationName;// 常數 === final 常數是不可變的
+
+                    const weatherElement = location[i].weatherElement;
+                    
+                    const min = Array.from(weatherElement).find(s => s.elementName === 'MinT'); // MinT 
+                    const max = Array.from(weatherElement).find(s => s.elementName === 'MaxT'); // MaxT 
+
+                    // 
+                    const minD = min.time[1].parameter.parameterName; // 1 最低溫
+                    const maxD = max.time[0].parameter.parameterName; // 0 最高溫
+
+                    console.log(locationName, min, max);
+                    console.log(locationName, minD, maxD);
+                    
+                    
+                    // ctrl + / (右邊 shirft 的左邊) 
+                    // JS template
+                    list.innerHTML = 
+                        `
+                            ${list.innerHTML}
+                            <div>
+                                ${locationName} :
+                                最低溫 : ${minD} ~ 最高溫 : ${maxD}
+                            </div>
+                        `
+                };
+               
+             });
+        };
+
+    </script>
+    
+    <h3>Fetch / AJAX 基本練習</h3>
+    <button onclick="getData();">取得後端提供的資料</button>
+    <div id="list"></div>
+    <script>
+        //AJAX: Asynchronous JavaScript And XML
+            //XRH: XMLHttpRequest
+            //Fetch: fetch() ->JS內建的函式
+            //AJAX:不重新載入網頁的狀況下，使用JS程式背景和後端進行互動
+        //https://cwpeng.github.io/live-records-samples/data/products.json
+        function getData(){
+            let src="https://cwpeng.github.io/live-records-samples/data/products.json"
+            fetch(src).then(function(response){
+                console.log(response);//meta data附加資訊
+                return response.json();//使用JSON資料格式解析取得的資料
+            }).then(function(result){
+                //在這裡取得後端回應的資料
+                console.log(result);
+                let list=document.querySelector("#list");
+                for(let i=0;i<result.length;i++){
+                    list.innerHTML=list.innerHTML+"<div>"+result[i].name+":"+result[i].price+"</div>";
+                }
+             });
+        }
+        //JSON 格式的物件 / 陣列結構
+        /*
+        let data={
+            nextPage:2,
+            list:[
+                {
+                    name:"測試",
+                    age:15,
+                    interests:["爬山","游泳"]
+                },
+                {
+                    name:"蘋果",
+                    age:20,
+                    interests:["打電動","看漫畫"]
+                }
+            ]
+        };
+        console.log(data);
+        console.log(data.list[0].name);
+        console.log(data.list[1].age);
+        console.log(data.list[1].interests[0]);
+        console.log(data.list[1].interests[1]);
+        for(let i=0;i<data.list[1].interests.length;i++){
+            console.log(data.list[1].interests[i])
+        }
+        */
+    </script>
+</body>
+</html>
